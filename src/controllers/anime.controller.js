@@ -8,10 +8,15 @@ const findanime = asyncHandler(async (req, res) => {
     throw new APIError(400, "Anime name is required!");
   }
   const result = await fetch(
-    `https://api.jikan.moe/v4/anime?q=${anime}&limit=5`,
+    `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(anime)}&limit=8`,
   );
   if (!result.ok) {
-    throw new APIError(result.status, "Unknown error occured");
+    const text = await result.text();
+    console.log("Jikan API error:", text);
+    throw new APIError(
+      result.status,
+      "Anime service temporarily unavailable. Please try again.",
+    );
   }
   const data = await result.json();
   if (data.data.length === 0) throw new APIError(404, "No anime found");

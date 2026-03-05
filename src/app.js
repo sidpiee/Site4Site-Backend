@@ -1,11 +1,13 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(",") || "https://localhost:5173",
+    origin: process.env.CORS_ORIGIN?.split(","),
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
