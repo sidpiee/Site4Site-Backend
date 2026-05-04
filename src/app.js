@@ -19,8 +19,10 @@ app.use(express.static("public"));
 
 import healthcheckRouter from "./routes/healthcheck.routes.js";
 import animeRouter from "./routes/anime.routes.js";
+import movieRouter from "./routes/movie.routes.js";
 
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/anime", animeRouter);
+app.use("/api/v1/movie", movieRouter);
 
 export default app;

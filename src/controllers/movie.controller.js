@@ -4,20 +4,22 @@ import { asyncHandler } from "../utils/async-handler.js";
 import NodeCache from "node-cache";
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
-const findanime = asyncHandler(async (req, res) => {
-  const { anime } = req.query;
-  if (!anime?.trim()) {
-    throw new APIError(400, "Anime name is required!");
+const findmovie = asyncHandler(async (req, res) => {
+  const { movie } = req.query;
+  if (!movie?.trim()) {
+    throw new APIError(400, "Movie name is required!");
   }
 
-  const cachedData = myCache.get(anime);
+  const normalizedMovie = movie.trim().toLowerCase();
+
+  const cachedData = myCache.get(normalizedMovie);
   if (cachedData) {
     return res
       .status(200)
       .json(new APIResponse(200, cachedData, "Fetched from cache"));
   }
   const result = await fetch(
-    `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(anime)}&limit=8`,
+    `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${encodeURIComponent(movie)}`,
     {
       headers: {
         "User-Agent": "Mozilla/5.0",
@@ -27,18 +29,18 @@ const findanime = asyncHandler(async (req, res) => {
   );
   if (!result.ok) {
     const text = await result.text();
-    console.log("Jikan API error:", text);
+    console.log("Movie API error:", result.status, text);
     throw new APIError(
       result.status,
-      "Anime service temporarily unavailable. Please try again.",
+      "movie service temporarily unavailable. Please try again.",
     );
   }
   const data = await result.json();
-  if (data.data.length === 0) throw new APIError(404, "No anime found");
-  myCache.set(anime, data.data);
+  if (data.Response === "False") throw new APIError(404, "No movie found");
+  myCache.set(normalizedMovie, data);
   res
     .status(200)
-    .json(new APIResponse(200, data.data, "Anime fetched successfully"));
+    .json(new APIResponse(200, data, "movie fetched successfully"));
 });
 
-export { findanime };
+export { findmovie };
