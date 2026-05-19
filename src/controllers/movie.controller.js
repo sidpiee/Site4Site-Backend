@@ -59,7 +59,7 @@ const findParticularMovie = asyncHandler(async (req, res) => {
       .json(new APIResponse(200, cachedData, "Fetched from cache"));
   }
   const result = await fetch(
-    `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${encodeURIComponent(movie)}`,
+    `http://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${encodeURIComponent(movie)}`,
     {
       headers: {
         "User-Agent": "Mozilla/5.0",
