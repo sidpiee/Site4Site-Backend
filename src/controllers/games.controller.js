@@ -40,13 +40,12 @@ const findgame = asyncHandler(async (req, res) => {
 
 const findParticulargame = asyncHandler(async (req, res) => {
   const { id } = req.query;
-  if (!id?.trim()) {
+  if (!id) {
     throw new APIError(400, "game id is required!");
   }
 
-  const normalizedId = id.trim().toLowerCase();
-
-  const cachedData = myCache.get(normalizedId);
+  const cacheKey = `game-${id}`;
+  const cachedData = myCache.get(cacheKey);
   if (cachedData) {
     return res
       .status(200)
@@ -55,10 +54,7 @@ const findParticulargame = asyncHandler(async (req, res) => {
   const result = await fetch(
     `https://api.rawg.io/api/games/${encodeURIComponent(id)}?key=${process.env.RAWG_API_KEY}` ,
     {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        Accept: "application/json",
-      },
+      
     },
   );
   if (!result.ok) {
@@ -72,10 +68,82 @@ const findParticulargame = asyncHandler(async (req, res) => {
   const data = await result.json();
   if (!data?.id)
     throw new APIError(404, data.Error || "No game found");
-  myCache.set(normalizedId, data);
+  myCache.set(cacheKey, data);
   res
     .status(200)
     .json(new APIResponse(200, data, "game fetched successfully"));
 });
 
-export { findgame, findParticulargame };
+
+const findScreenshots = asyncHandler(async (req, res) => {
+  const { id } = req.query;
+  if (!id) {
+    throw new APIError(400, "game id is required!");
+  }
+
+  const cacheKey = `screenshots-${id}`;
+  const cachedData = myCache.get(cacheKey);
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(new APIResponse(200, cachedData, "Fetched from cache"));
+  }
+  const result = await fetch(
+    `https://api.rawg.io/api/games/${encodeURIComponent(id)}/screenshots?key=${process.env.RAWG_API_KEY}` ,
+    {
+      
+    },
+  );
+  if (!result.ok) {
+    const text = await result.text();
+    console.log("game API error:", result.status, text);
+    throw new APIError(
+      result.status,
+      "game service temporarily unavailable. Please try again.",
+    );
+  }
+  const data = await result.json();
+  if (!data?.results?.length)
+    throw new APIError(404, data.Error || "No screenshot found");
+  myCache.set(cacheKey, data);
+  res
+    .status(200)
+    .json(new APIResponse(200, data, "game fetched successfully"));
+});
+const findTrailer = asyncHandler(async (req, res) => {
+  const { id } = req.query;
+  if (!id) {
+    throw new APIError(400, "game id is required!");
+  }
+
+  const cacheKey = `trailer-${id}`;
+  const cachedData = myCache.get(cacheKey);
+  if (cachedData) {
+    return res
+      .status(200)
+      .json(new APIResponse(200, cachedData, "Fetched from cache"));
+  }
+  const result = await fetch(
+    `https://api.rawg.io/api/games/${encodeURIComponent(id)}/movies?key=${process.env.RAWG_API_KEY}` ,
+    {
+      
+    },
+  );
+  if (!result.ok) {
+    const text = await result.text();
+    console.log("game API error:", result.status, text);
+    throw new APIError(
+      result.status,
+      "game service temporarily unavailable. Please try again.",
+    );
+  }
+  const data = await result.json();
+  if (!data?.results?.length)
+    throw new APIError(404, data.Error || "No trailer found");
+  myCache.set(cacheKey, data,124000);
+  res
+    .status(200)
+    .json(new APIResponse(200, data, "game fetched successfully"));
+});
+
+export { findgame, findParticulargame , findScreenshots , findTrailer};
