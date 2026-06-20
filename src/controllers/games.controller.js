@@ -105,7 +105,7 @@ const findScreenshots = asyncHandler(async (req, res) => {
   const data = await result.json();
   if (!data?.results?.length)
     throw new APIError(404, data.Error || "No screenshot found");
-  myCache.set(cacheKey, data);
+  myCache.set(cacheKey, data , 124000);
   res
     .status(200)
     .json(new APIResponse(200, data, "game fetched successfully"));
