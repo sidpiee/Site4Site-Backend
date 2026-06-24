@@ -2,6 +2,7 @@ import { APIResponse } from "../utils/api-response.js";
 import { APIError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import NodeCache from "node-cache";
+import { Anime } from "../models/anime.model.js";
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const findanime = asyncHandler(async (req, res) => {
@@ -41,4 +42,17 @@ const findanime = asyncHandler(async (req, res) => {
     .json(new APIResponse(200, data.data, "Anime fetched successfully"));
 });
 
-export { findanime };
+const addAnime = asyncHandler(async(req,res) =>{
+   try {
+    const anime = await Anime.create({
+      ...req.body ,
+      userId : req.user.id,
+      image : req.body.images.jpg.large_image_url,
+    });
+
+    res.status(201).json(new APIResponse(201 , anime , "Anime saved successfully"));
+  } catch (error) {
+    throw new APIError(500 , error.message)
+  }
+})
+export { findanime , addAnime };

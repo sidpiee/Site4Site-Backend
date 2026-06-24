@@ -1,6 +1,6 @@
 import { supabase } from "../lib/supabase.js";
 import { APIError } from "../utils/api-error.js";
-import asyncHandler from "../utils/async-handler.js"
+import {asyncHandler} from "../utils/async-handler.js"
 
 export const requireAuth = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
