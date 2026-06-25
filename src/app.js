@@ -25,6 +25,17 @@ import gameRouter from "./routes/games.routes.js"
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/anime", animeRouter);
 app.use("/api/v1/movie", movieRouter);
-app.use("/api/v1/game" , gameRouter)
+app.use("/api/v1/game" , gameRouter);
+app.use((err, req, res, next) => {
+  console.error(
+    `[${req.method}] ${req.originalUrl}:`,
+    err.message
+  );
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    errors: err.errors || [],
+  });
+});
 
 export default app;

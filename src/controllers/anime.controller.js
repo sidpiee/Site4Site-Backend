@@ -3,6 +3,7 @@ import { APIError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import NodeCache from "node-cache";
 import { Anime } from "../models/anime.model.js";
+import { Db } from "mongodb";
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const findanime = asyncHandler(async (req, res) => {
@@ -55,4 +56,24 @@ const addAnime = asyncHandler(async(req,res) =>{
     throw new APIError(500 , error.message)
   }
 })
-export { findanime , addAnime };
+const getAnime = asyncHandler(async (req , res) => {
+  try {
+    const data = await Anime.aggregate([
+  {
+    $match: {
+      userId: req.user.id,
+    },
+  },
+  {
+    $sort: {
+      updatedAt: -1,
+    },
+  },
+]);
+    res.status(200).json(new APIResponse(200 , data , "User-Anime fetched successfully"));
+  }
+  catch(error){
+    throw new APIError(500 , error.message);
+  }
+})
+export { findanime , addAnime , getAnime};
