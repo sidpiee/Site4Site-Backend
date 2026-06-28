@@ -2,6 +2,7 @@ import { APIResponse } from "../utils/api-response.js";
 import { APIError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import NodeCache from "node-cache";
+import { Game } from "../models/game.model.js";
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const findgame = asyncHandler(async (req, res) => {
@@ -146,4 +147,26 @@ const findTrailer = asyncHandler(async (req, res) => {
     .json(new APIResponse(200, data, "game fetched successfully"));
 });
 
-export { findgame, findParticulargame , findScreenshots , findTrailer};
+const addGame = asyncHandler(async(req , res)=> {
+  const game = await Game.create({
+    ...req.body ,
+    userId : req.user.id
+  })
+  res.status(201).json(new APIResponse(201 , game , "Game added successfully"));
+})
+const getGame = asyncHandler(async(req,res) => {
+    const data = await Game.aggregate([
+    {
+      $match: {
+        userId: req.user.id,
+      },
+    },
+    {
+      $sort: {
+        updatedAt: -1,
+      },
+    },
+  ]);
+  res.status(200).json(new APIResponse(200 , data , "User-Game fetched successfully"));
+})
+export { findgame, findParticulargame , findScreenshots , findTrailer , addGame ,getGame};
