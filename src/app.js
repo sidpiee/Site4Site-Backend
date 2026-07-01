@@ -20,12 +20,14 @@ app.use(express.static("public"));
 import healthcheckRouter from "./routes/healthcheck.routes.js";
 import animeRouter from "./routes/anime.routes.js";
 import movieRouter from "./routes/movie.routes.js";
-import gameRouter from "./routes/games.routes.js"
+import gameRouter from "./routes/games.routes.js";
+import taskRouter from "./routes/task.routes.js";
 
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/anime", animeRouter);
 app.use("/api/v1/movie", movieRouter);
 app.use("/api/v1/game" , gameRouter);
+app.use("/api/v1/task" ,taskRouter);
 app.use((err, req, res, next) => {
   console.error(
     `[${req.method}] ${req.originalUrl}:`,
