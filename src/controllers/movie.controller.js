@@ -127,7 +127,7 @@ const editMovie = asyncHandler(async(req ,res) => {
   { new: true }
 );
 if (!m) {
-  throw new APIError(404, "Movie not found");
+  throw new APIError(404, "Movie not updated");
 }
 
 return res.status(200).json(new APIResponse(200 , m , "Movie updated successfully"));

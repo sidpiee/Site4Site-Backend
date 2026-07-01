@@ -25,4 +25,38 @@ const getTask = asyncHandler(async(req,res)=> {
       ]);
       res.status(200).json(new APIResponse(200 , data , "User-Game fetched successfully"));
 })
-export {addTask , getTask};
+const toggleTask = asyncHandler(async(req , res) => {
+    const {id} = req.params ;
+    const {completed} = req.body;
+     const t = await Task.findOneAndUpdate(
+      {
+        id: id,
+        userId: req.user.id,
+      },
+      {
+        completed,
+      },
+      { new: true }
+    );
+    if (!t) {
+      throw new APIError(404, "Task not updated");
+    }
+    return res.status(200).json(new APIResponse(200 , t , "Task updated successfuly"));
+})
+const deleteTask = asyncHandler(async(req,res) => {
+    const {id} = req.params;
+    const task = await Task.findOneAndDelete({
+    id,
+    userId: req.user.id,
+  });
+
+  if (!task) {
+    throw new APIError(404, "Task not found");
+  }
+
+  return res
+    .status(200)
+    .json(new APIResponse(200, task, "Task deleted successfully"));
+});
+
+export {addTask , getTask , toggleTask,deleteTask};
