@@ -23,7 +23,7 @@ const getTask = asyncHandler(async(req,res)=> {
           },
         },
       ]);
-      res.status(200).json(new APIResponse(200 , data , "User-Game fetched successfully"));
+      res.status(200).json(new APIResponse(200 , data , "User-Task fetched successfully"));
 })
 const toggleTask = asyncHandler(async(req , res) => {
     const {id} = req.params ;

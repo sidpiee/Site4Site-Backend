@@ -3,7 +3,7 @@ import { APIError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import NodeCache from "node-cache";
 import { Anime } from "../models/anime.model.js";
-import { Db } from "mongodb";
+
 
 const myCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
 const findanime = asyncHandler(async (req, res) => {
