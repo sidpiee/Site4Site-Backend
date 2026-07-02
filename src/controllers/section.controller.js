@@ -44,4 +44,25 @@ const getSection = asyncHandler(async(req,res)=> {
 res.status(200).json(new APIResponse(200 , sections , "User-Game fetched successfully"));
 
 })
-export {addSection ,deleteSection , getSection};
+
+const addSite = asyncHandler(async (req, res) => {
+  const {id} = req.params;
+  const s = Site.create({
+    ...req.body ,
+    sectionId : id,
+  });
+  res.status(200).json(new APIResponse(200 , s , "Site added successfully"));
+})
+const deleteSite = asyncHandler(async(req,res)=> {
+  const {sectionId , id } = req.params;
+  const s = await Site.findOneAndDelete({
+    sectionId , 
+    _id : id,
+  })
+  if (!s) {
+  throw new APIError(404, "Site not found");
+}
+  res.status(200).json(new APIResponse(200 , s , "Site deleted successfully"));
+})
+
+export {addSection ,deleteSection , getSection , addSite , deleteSite};
