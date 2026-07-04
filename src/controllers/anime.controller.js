@@ -76,4 +76,22 @@ const getAnime = asyncHandler(async (req , res) => {
     throw new APIError(500 , error.message);
   }
 })
-export { findanime , addAnime , getAnime};
+const updateAnime = asyncHandler(async(req,res) => {
+  const {id} = req.params;
+  const {status , episodesWatched , notes , rating} = req.body;
+  const a = await Anime.findOneAndUpdate({
+    userId : req.user.id ,
+    mal_id : Number(id) ,
+  },
+  {
+    status , 
+    episodesWatched , 
+    notes ,
+    rating,
+  },
+  {new : true}
+)
+if(!a) throw new APIError(404 , "Anime not updated");
+res.status(200).json(new APIResponse(200 , a , "Anime updated successfully"));
+})
+export { findanime , addAnime , getAnime , updateAnime};
