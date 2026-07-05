@@ -132,4 +132,33 @@ if (!m) {
 
 return res.status(200).json(new APIResponse(200 , m , "Movie updated successfully"));
 })
-export { findmovie, findParticularMovie , addMovie , getMovie ,editMovie};
+
+const updateMovie = asyncHandler(async(req , res) => {
+  const {id} = req.params;
+  const {status , notes} = req.body;
+  const m = await Movie.findOneAndUpdate({
+    userId : req.user.id,
+    imdbID : id,
+  },
+{ 
+  status , notes
+} , {new : true})
+
+if(!m) throw new APIError(500 , "Movie not updated");
+return res.status(200).json(new APIResponse(200 , m , "Movie updated successfully"));
+
+})
+const deleteMovie = asyncHandler(async(req , res) => {
+  const {id} = req.params;
+  const m = await Movie.findOneAndDelete({
+    userId : req.user.id,
+    imdbID : id,
+  },
+)
+
+if(!m) throw new APIError(500 , "Movie not deleted");
+return res.status(200).json(new APIResponse(200 , m , "Movie deleted successfully"));
+
+})
+
+export { findmovie, findParticularMovie , addMovie , getMovie ,editMovie , updateMovie , deleteMovie};
