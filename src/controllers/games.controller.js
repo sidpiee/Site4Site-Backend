@@ -169,4 +169,27 @@ const getGame = asyncHandler(async(req,res) => {
   ]);
   res.status(200).json(new APIResponse(200 , data , "User-Game fetched successfully"));
 })
-export { findgame, findParticulargame , findScreenshots , findTrailer , addGame ,getGame};
+const updateGame = asyncHandler(async(req , res) => {
+  const {id} = req.params;
+  const {status , note , personalRating , favourite} = req.body;
+  const s = await Game.findOneAndUpdate({
+    userId : req.user.id,
+    id,
+  }, {
+    status , review : note , personalRating , favourite
+  } ,{
+    new : true,
+  })
+  if(!s) throw new APIError(500 , "Game not updated");
+  res.status(200).json(new APIResponse(200 , s , "Game updated successfully"));
+})
+const deleteGame = asyncHandler(async(req , res)=> {
+  const {id} = req.params;
+  const g = await Game.findOneAndDelete({
+    id ,
+    userId : req.user.id,
+  })
+  if(!g) throw new APIError(500 , "Game not deleted");
+  res.status(200).json(new APIResponse(200 , g , "Game deleted successfully"));
+})
+export { findgame, findParticulargame , findScreenshots , findTrailer , addGame ,getGame , updateGame , deleteGame};
