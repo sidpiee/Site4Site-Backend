@@ -58,5 +58,18 @@ const deleteTask = asyncHandler(async(req,res) => {
     .status(200)
     .json(new APIResponse(200, task, "Task deleted successfully"));
 });
+const updateTask = asyncHandler(async(req ,res)=> {
+  const {id} = req.params;
+  const {text} = req.body;
+  if(!text) throw new APIError(400 , "Text cannot be empty");
+  const t = await Task.findOneAndUpdate({
+    userId : req.user.id,
+    id,
+  },{
+    text,
+  }, {new : true}) ;
+  if(!t) throw new APIError(500 , "task not updated");
+  res.status(200).json(new APIResponse(200 , t , "Task updated successfully"));
 
-export {addTask , getTask , toggleTask,deleteTask};
+})
+export {addTask , getTask , toggleTask , deleteTask , updateTask};
