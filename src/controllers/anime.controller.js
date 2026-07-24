@@ -121,6 +121,53 @@ const findanime = asyncHandler(async (req, res) => {
     .status(200)
     .json(new APIResponse(200, animeList, "Anime fetched successfully"));
 });
+
+const getAnimeGenres = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!id || !Number.isFinite(Number(id))) {
+    throw new APIError(400, "Valid anime ID is required");
+  }
+
+  const cacheKey = `anime-genres:${id}`;
+  const cachedGenres = myCache.get(cacheKey);
+
+  if (cachedGenres) {
+    return res
+      .status(200)
+      .json(new APIResponse(200, cachedGenres, "Fetched from cache"));
+  }
+
+  const response = await fetch(
+    `https://kitsu.io/api/edge/anime/${encodeURIComponent(id)}/genres`,
+    {
+      headers: {
+        Accept: "application/vnd.api+json",
+      },
+      signal: AbortSignal.timeout(10000),
+    }
+  );
+
+  if (!response.ok) {
+    throw new APIError(
+      response.status,
+      "Could not fetch genres for this anime"
+    );
+  }
+
+  const data = await response.json();
+
+  const genres = (data.data ?? []).map((genre) => ({
+    mal_id: Number(genre.id),
+    name: genre.attributes.name,
+  }));
+
+  myCache.set(cacheKey, genres);
+
+  return res
+    .status(200)
+    .json(new APIResponse(200, genres, "Genres fetched successfully"));
+});
 const addAnime = asyncHandler(async(req,res) =>{
    try {
     const anime = await Anime.create({
@@ -181,4 +228,4 @@ const deleteAnime = asyncHandler(async(req , res) => {
   if(!a) throw new APIError(500 , "Anime not deleted");
   res.status(200).json(new APIResponse(200 , a , "Anime deleted successfully"));
 })
-export { findanime , addAnime , getAnime , updateAnime , deleteAnime};
+export { findanime , addAnime , getAnime , updateAnime , deleteAnime , getAnimeGenres};
