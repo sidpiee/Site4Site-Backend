@@ -1,20 +1,21 @@
-import dotenv from "dotenv";
 import app from "./app.js";
-// import dns from "dns";
+import { validateEnvironment } from "./config/env.js";
 import connectDB from "./db/index.js";
-// dns.setServers(["1.1.1.1" , "8.8.8.8"]);
-dotenv.config({
-  path: "./.env",
-});
 
-const port = process.env.PORT || 8000;
+validateEnvironment();
+
+const port = Number(process.env.PORT ?? 8000);
+
 connectDB()
   .then(() => {
-    app.listen(port, () => {
-      console.log(`Example app listening on port http://localhost:${port}`);
+    const server = app.listen(port, () => {
+      console.log(`API listening on port ${port}`);
     });
+
+    server.requestTimeout = 30000;
+    server.headersTimeout = 35000;
   })
-  .catch((err) => {
-    console.error("MongoDB connection failed", err);
+  .catch((error) => {
+    console.error("Application startup failed", error);
     process.exit(1);
   });
